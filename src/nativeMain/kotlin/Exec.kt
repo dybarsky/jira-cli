@@ -54,13 +54,14 @@ private fun Config.close() {
 }
 
 private fun Config.list(status: Status) {
-    val operator = when(status) {
-        Status.Open     -> "= 'To Do'"
-        Status.Closed   -> "= Done"
+    val category = when(status) {
+        Status.Open       -> "'To Do'"
+        Status.Progress   -> "'In Progress'"
+        Status.Closed     -> "Done"
     }
     val query = """
         sprint = $sprint 
-        AND statusCategory $operator 
+        AND statusCategory = $category 
         AND component in ($components) 
     """.trimIndent().replace("\n", "")
     println("Loading...")

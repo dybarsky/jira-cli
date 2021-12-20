@@ -2,7 +2,7 @@
 value class Issue(val id: Int)
 
 enum class Status {
-    Open, Closed
+    Open, Progress, Closed
 }
 
 sealed interface Command {
@@ -40,13 +40,13 @@ fun String?.asIssue(): Int =
 fun String?.asStatus(): Status = Status
     .values()
     .firstOrNull { this.equals(it.name, ignoreCase = true) }
-    ?: error("Status not supported. Use open or close")
+    ?: error("Status not supported. Use [open|progress|closed]")
 
 private fun help(): Nothing {
     println("""
         Usage: jira <command> <args>
         Commands:
-            list <status> - tickets list in sprint for given status [open|closed]
+            list <status> - tickets list in sprint by status [open|progress|closed]
             init <number> - saves issue id to .git/ticket file
             start         - assigns ticket and moves it to `in progress` 
             review        - move ticket to `in review` status
