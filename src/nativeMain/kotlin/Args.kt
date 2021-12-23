@@ -4,28 +4,54 @@ value class Issue(val id: Int)
 enum class Status {
     Open, Progress, Closed
 }
+data class Query(
+    val me: Boolean,
+    val status: Status?,
+)
 
 sealed interface Command {
-    data class Init(val issue: Issue) : Command
-    data class List(val status: Status) : Command
-    object Start : Command
-    object Review : Command
-    object Done : Command
-    object Close : Command
+    object Show : Command
     object Clean : Command
+    object Version : Command
+    data class List(val query: Query) : Command
+    data class Init(val issue: Issue) : Command
+    data class Start(val issue: Issue?) : Command
+    data class Review(val issue: Issue?) : Command
+    data class Done(val issue: Issue?) : Command
+    data class Close(val issue: Issue?) : Command
 }
 
 fun parse(args: Array<String>): Command {
-    return when (args.firstOrNull()) {
-        "list"      -> Command.List(args.second(String?::asStatus))
-        "init"      -> Command.Init(Issue(args.second(String?::asIssue)))
-        "start"     -> Command.Start
-        "review"    -> Command.Review
-        "done"      -> Command.Done
-        "close"     -> Command.Close
+    val command = args.firstOrNull()
+    val params = args.drop(1)
+    val issue = params.findIssue()
+    return when (command) {
+        "list"      -> Command.List(params.findQuery())
+        "init"      -> Command.Init(issue ?: error("Provide issue id"))
+        "start"     -> Command.Start(issue)
+        "review"    -> Command.Review(issue)
+        "done"      -> Command.Done(issue)
+        "close"     -> Command.Close(issue)
+        "version"   -> Command.Version
         "clean"     -> Command.Clean
+        "show"      -> Command.Show
         else        -> help()
     }
+}
+
+private fun List<String>.findQuery(): Query {
+    val me = any { it.equals("me", ignoreCase = true) }
+    val status = mapNotNull { it.asStatus() }.firstOrNull()
+    if (status == null && me.not()) {
+        error("Query can't be empty. Use [me] and optional status [open|progress|closed]")
+    }
+    return Query(me, status)
+}
+
+private fun List<String>.findIssue(): Issue? {
+    return mapNotNull {
+        runCatching { Issue(it.toInt()) }.getOrNull()
+    }.firstOrNull()
 }
 
 private fun <T> Array<String>.second(mapper: (String?) -> T): T {
@@ -37,10 +63,9 @@ fun String?.asIssue(): Int =
         .getOrNull()
         ?: error("Can't parse issue id")
 
-fun String?.asStatus(): Status = Status
+fun String?.asStatus(): Status? = Status
     .values()
     .firstOrNull { this.equals(it.name, ignoreCase = true) }
-    ?: error("Status not supported. Use [open|progress|closed]")
 
 private fun help(): Nothing {
     println("""
