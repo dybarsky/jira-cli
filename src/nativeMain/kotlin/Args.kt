@@ -19,6 +19,7 @@ sealed interface Command {
     data class Review(val issue: Issue?) : Command
     data class Done(val issue: Issue?) : Command
     data class Close(val issue: Issue?) : Command
+    data class Browse(val issue: Issue?) : Command
 }
 
 fun parse(args: Array<String>): Command {
@@ -32,6 +33,7 @@ fun parse(args: Array<String>): Command {
         "review"    -> Command.Review(issue)
         "done"      -> Command.Done(issue)
         "close"     -> Command.Close(issue)
+        "browse"    -> Command.Browse(issue)
         "version"   -> Command.Version
         "clean"     -> Command.Clean
         "show"      -> Command.Show
@@ -78,6 +80,9 @@ private fun help(): Nothing {
             done          - move ticket to `qa stage` status
             close         - close ticket with `done` status
             clean         - clears .git/ticket file
+            browse        - open jira ticket in the browser
+            show          - prints current ticket number
+            version       - prints version of the app
     """.trimIndent())
     error("")
 }

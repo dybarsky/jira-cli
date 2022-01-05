@@ -8,6 +8,7 @@ fun execute(command: Command, config: Config) {
             is Command.Review   -> review(command.issue)
             is Command.Done     -> done(command.issue)
             is Command.Close    -> close(command.issue)
+            is Command.Browse   -> browse(command.issue)
             is Command.Clean    -> clean()
             is Command.Show     -> show()
             is Command.Version  -> version()
@@ -60,6 +61,13 @@ private fun Config.close(issue: Issue?) {
     val ticket = issue?.id?.let { "$project-$it" } ?: loadTicket()
     log("moving to done...") {
         "jira-cli transition --noedit 'closed' $ticket".exec()
+    }
+}
+
+private fun Config.browse(issue: Issue?) {
+    val ticket = issue?.id?.let { "$project-$it" } ?: loadTicket()
+    log("opening browser...") {
+        "jira-cli browse $ticket".exec()
     }
 }
 
