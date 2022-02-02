@@ -22,13 +22,17 @@ private inline fun Config.getTicket(issue: Issue?): String =
         ?.let { "$project-$it" }
         ?: branchTicket()
 
-private fun Config.start(issue: Issue?) {
-    val ticket = getTicket(issue)
+private inline fun prompt(ticket: String, action: String = "Updating") {
     if (ticket.isEmpty()) {
         println("Provide issue")
         return
     }
-    println("Updating $ticket:")
+    println("$action ${ticket.yellow().dim()}:")
+}
+
+private fun Config.start(issue: Issue?) {
+    val ticket = getTicket(issue)
+    prompt(ticket)
     journal("assigning issue") {
         "jira-cli assign -Q $ticket $user".exec()
     }
@@ -39,11 +43,7 @@ private fun Config.start(issue: Issue?) {
 
 private fun Config.review(issue: Issue?) {
     val ticket = getTicket(issue)
-    if (ticket.isEmpty()) {
-        println("Provide issue")
-        return
-    }
-    println("Updating $ticket:")
+    prompt(ticket)
     journal("moving to review") {
         "jira-cli transition --noedit 'in review' $ticket".exec()
     }
@@ -51,11 +51,7 @@ private fun Config.review(issue: Issue?) {
 
 private fun Config.done(issue: Issue?) {
     val ticket = getTicket(issue)
-    if (ticket.isEmpty()) {
-        println("Provide issue")
-        return
-    }
-    println("Updating $ticket:")
+    prompt(ticket)
     journal("moving to done") {
         "jira-cli transition --noedit 'closed' $ticket".exec()
     }
@@ -63,23 +59,15 @@ private fun Config.done(issue: Issue?) {
 
 private fun Config.browse(issue: Issue?) {
     val ticket = getTicket(issue)
-    if (ticket.isEmpty()) {
-        println("Provide issue")
-        return
-    }
-    println("Updating $ticket:")
-    journal("opening browser") {
+    prompt(ticket, action = "Opening")
+    journal("starting browser") {
         "jira-cli browse $ticket".exec()
     }
 }
 
 private fun Config.block(issue: Issue?) {
     val ticket = getTicket(issue)
-    if (ticket.isEmpty()) {
-        println("Provide issue")
-        return
-    }
-    println("Updating $ticket:")
+    prompt(ticket)
     journal("moving blocked") {
         "jira-cli transition --noedit 'blocked' $ticket".exec()
     }
@@ -102,5 +90,5 @@ private fun Config.list(query: Query) {
     print("Loading...")
     val result = "jira-cli list -q \"$jiraQuery\"".exec()
     print("\r          \r")
-    print(result)
+    print(result.output)
 }

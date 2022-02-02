@@ -1,5 +1,5 @@
 
-const val VERSION = "0.0.3"
+const val VERSION = "0.0.4"
 
 fun main(args: Array<String>) {
 	runCatching {
@@ -7,6 +7,6 @@ fun main(args: Array<String>) {
 		val config = readConfig()
 		execute(command, config)
 	}.onFailure {
-		println(it.message)
+		println("error: ".red() + it.message)
 	}
 }

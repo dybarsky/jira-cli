@@ -1,4 +1,16 @@
 
+private val help = """
+    Usage: jira <command> <args>
+    Commands:
+        list <status> - tickets list in sprint by status [open|progress|closed]
+        start         - assigns ticket and moves it to `in progress` 
+        review        - move ticket to `in review` status
+        done          - move ticket to `closed` status
+        blocked       - move ticket to `blocked` status
+        browse        - open jira ticket in the browser
+        version       - prints version of the app
+""".trimIndent()
+
 value class Issue(val id: Int)
 
 enum class Status {
@@ -31,7 +43,7 @@ fun parse(args: Array<String>): Command {
         "blocked"   -> Command.Blocked(issue)
         "browse"    -> Command.Browse(issue)
         "version"   -> Command.Version
-        else        -> help()
+        else        -> error("Unknown command ${command?.dim() ?: ""}\n$help")
     }
 }
 
@@ -50,30 +62,6 @@ private fun List<String>.findIssue(): Issue? {
     }.firstOrNull()
 }
 
-private fun <T> Array<String>.second(mapper: (String?) -> T): T {
-    return getOrNull(1).run(mapper)
-}
-
-fun String?.asIssue(): Int =
-    runCatching { this?.toInt() }
-        .getOrNull()
-        ?: error("Can't parse issue id")
-
-fun String?.asStatus(): Status? = Status
+private fun String?.asStatus(): Status? = Status
     .values()
     .firstOrNull { this.equals(it.name, ignoreCase = true) }
-
-private fun help(): Nothing {
-    println("""
-        Usage: jira <command> <args>
-        Commands:
-            list <status> - tickets list in sprint by status [open|progress|closed]
-            start         - assigns ticket and moves it to `in progress` 
-            review        - move ticket to `in review` status
-            done          - move ticket to `closed` status
-            blocked       - move ticket to `blocked` status
-            browse        - open jira ticket in the browser
-            version       - prints version of the app
-    """.trimIndent())
-    error("")
-}
