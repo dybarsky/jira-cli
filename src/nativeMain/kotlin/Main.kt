@@ -1,5 +1,5 @@
 
-const val VERSION = "0.0.2"
+const val VERSION = "0.0.3"
 
 fun main(args: Array<String>) {
 	runCatching {

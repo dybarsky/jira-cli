@@ -20,3 +20,9 @@ fun String.exec(): String {
 
     return stdout
 }
+
+inline fun journal(message: String, operation: () -> Any) {
+    print("$message...")
+    operation()
+    println("Ok")
+}
