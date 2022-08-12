@@ -7,7 +7,7 @@ fun execute(command: Command, config: Config) {
             is Command.Review   -> review(command.issue)
             is Command.Done     -> done(command.issue)
             is Command.Browse   -> browse(command.issue)
-            is Command.Blocked  -> block(command.issue)
+            is Command.Qa       -> qa(command.issue)
             is Command.Version  -> version()
         }
     }
@@ -53,7 +53,7 @@ private fun Config.done(issue: Issue?) {
     val ticket = getTicket(issue)
     prompt(ticket)
     journal("moving to done") {
-        "jira-cli transition --noedit 'closed' $ticket".exec()
+        "jira-cli transition --noedit 'done' $ticket".exec()
     }
 }
 
@@ -65,11 +65,11 @@ private fun Config.browse(issue: Issue?) {
     }
 }
 
-private fun Config.block(issue: Issue?) {
+private fun Config.qa(issue: Issue?) {
     val ticket = getTicket(issue)
     prompt(ticket)
-    journal("moving blocked") {
-        "jira-cli transition --noedit 'blocked' $ticket".exec()
+    journal("moving to qa") {
+        "jira-cli transition --noedit 'qa' $ticket".exec()
     }
 }
 

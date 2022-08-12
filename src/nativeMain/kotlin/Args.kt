@@ -6,7 +6,7 @@ private val help = """
         start         - assigns ticket and moves it to `in progress` 
         review        - move ticket to `in review` status
         done          - move ticket to `closed` status
-        blocked       - move ticket to `blocked` status
+        qa            - move ticket to `qa` status
         browse        - open jira ticket in the browser
         version       - prints version of the app
 """.trimIndent()
@@ -28,7 +28,7 @@ sealed interface Command {
     data class Review(val issue: Issue?) : Command
     data class Done(val issue: Issue?) : Command
     data class Browse(val issue: Issue?) : Command
-    data class Blocked(val issue: Issue?) : Command
+    data class Qa(val issue: Issue?) : Command
 }
 
 fun parse(args: Array<String>): Command {
@@ -40,7 +40,7 @@ fun parse(args: Array<String>): Command {
         "start"     -> Command.Start(issue)
         "review"    -> Command.Review(issue)
         "done"      -> Command.Done(issue)
-        "blocked"   -> Command.Blocked(issue)
+        "qa"        -> Command.Qa(issue)
         "browse"    -> Command.Browse(issue)
         "version"   -> Command.Version
         else        -> error("Unknown command ${command?.dim() ?: ""}\n$help")
