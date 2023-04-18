@@ -1,5 +1,5 @@
 plugins {
-    kotlin("multiplatform") version "1.6.10"
+    kotlin("multiplatform") version "1.8.10"
 }
 
 repositories {
@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         val nativeMain by getting {
             dependencies {
-                implementation("com.squareup.okio:okio:3.0.0")
+                implementation("com.squareup.okio:okio:3.3.0")
             }
         }
     }
